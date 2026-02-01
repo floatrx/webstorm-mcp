@@ -2,9 +2,25 @@
 
 Bridge between WebStorm/JetBrains IDEs and Claude Code via MCP (Model Context Protocol).
 
-**Problem:** Claude Code running in terminal cannot see what you have selected in your IDE.
+## When Do You Need This?
 
-**Solution:** This project provides a WebStorm plugin + MCP server that lets Claude Code access your editor selection in real-time.
+**This MCP is specifically for running Claude Code in tmux/headless mode** — for example, when controlling Claude remotely via Telegram bot or SSH.
+
+> **Note:** If you're running Claude Code directly in your terminal (not in tmux), you don't need this. Instead, use the built-in IDE integration: **Claude Code Settings** → **IDE** → set custom command (e.g., `webstorm` or `ws`).
+
+**Problem:** When Claude Code runs inside tmux, it loses connection to your IDE and cannot see what you have selected.
+
+**Solution:** This project provides a WebStorm plugin + MCP server that lets Claude Code access your editor selection via HTTP, regardless of how Claude is launched.
+
+### Example: Running Claude in tmux
+
+```bash
+# Start Claude in a tmux session
+tmux new-session -s claude "claude"
+
+# Now you can detach (Ctrl+B, D) and control Claude remotely
+# The MCP bridge maintains IDE connection even when detached
+```
 
 ## Demo
 
@@ -32,16 +48,25 @@ Claude: "You have selected a TypeScript function at src/utils/helper.ts:45-52...
 
 ## Quick Start
 
-### 1. Build & Install Plugin
+### 1. Install Plugin
+
+> ⚠️ **Important:** This plugin is NOT available in JetBrains Marketplace. You must install it manually from the ZIP file.
+
+**Option A: Download Pre-built (Recommended)**
+
+1. Download `webstorm-ide-bridge-1.0.0.zip` from [Releases](https://github.com/floatrx/webstorm-mcp/releases)
+2. In WebStorm: **Settings** → **Plugins** → click ⚙️ (gear icon) → **Install Plugin from Disk...**
+3. Select the downloaded `.zip` file (do NOT extract it)
+4. Click **OK** and restart WebStorm
+
+**Option B: Build from Source**
 
 ```bash
 cd plugin
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21  # macOS with Homebrew
 ./gradlew buildPlugin
+# Install from: build/distributions/webstorm-ide-bridge-1.0.0.zip
 ```
-
-Install `build/distributions/webstorm-ide-bridge-1.0.0.zip` in WebStorm:
-- **Settings** → **Plugins** → ⚙️ → **Install Plugin from Disk...**
 
 ### 2. Build MCP Server
 
@@ -53,23 +78,55 @@ pnpm build
 
 ### 3. Configure Claude Code
 
-Add to `~/.claude/.mcp.json`:
+Add MCP server to your Claude Code configuration.
+
+**Option A: Global config** (recommended for personal use)
+
+Edit or create `~/.claude/.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "webstorm-bridge": {
       "command": "node",
-      "args": ["/absolute/path/to/webstorm-mcp/mcp-server/dist/index.js"]
+      "args": ["/Users/yourname/path/to/webstorm-mcp/mcp-server/dist/index.js"]
     }
   }
 }
 ```
 
-### 4. Restart Both
+**Option B: Project config** (for specific projects)
 
-1. Restart WebStorm (plugin loads on startup)
-2. Restart Claude Code (MCP server loads on startup)
+Create `.mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "webstorm-bridge": {
+      "command": "node",
+      "args": ["/Users/yourname/path/to/webstorm-mcp/mcp-server/dist/index.js"]
+    }
+  }
+}
+```
+
+> **Important:** Use absolute path to `dist/index.js`. Replace `/Users/yourname/path/to/` with your actual path.
+
+### 4. Restart & Verify
+
+1. **Restart WebStorm** — plugin loads on startup
+2. **Restart Claude Code** — MCP server loads on startup
+
+**Verify MCP is loaded:**
+
+```bash
+# In Claude Code, run:
+/mcp
+```
+
+You should see `webstorm-bridge` in the list of connected MCP servers with tools:
+- `get_ide_selection`
+- `get_ide_context`
 
 ### 5. Use It
 
@@ -77,6 +134,7 @@ Select code in WebStorm, then ask Claude:
 - "What do I have selected in my IDE?"
 - "Explain this code" (while having code selected)
 - "Refactor the selected function"
+- "What file am I looking at?"
 
 ## MCP Tools
 
@@ -121,6 +179,13 @@ Select code in WebStorm, then ask Claude:
 
 ## Troubleshooting
 
+### MCP not showing in Claude Code
+
+1. Check your `.mcp.json` path is correct (must be absolute path)
+2. Verify the file is valid JSON (no trailing commas)
+3. Restart Claude Code completely (`/exit` then relaunch)
+4. Check MCP server builds without errors: `cd mcp-server && pnpm build`
+
 ### Test plugin is running
 
 ```bash
@@ -128,16 +193,37 @@ curl http://localhost:63343/api/health
 # Should return: {"status":"ok","plugin":"ide-bridge","version":"1.0.0"}
 ```
 
+If this fails:
+- Make sure WebStorm is running
+- Check WebStorm logs for errors
+
 ### Test selection endpoint
 
 ```bash
+# Select some code in WebStorm first, then:
 curl http://localhost:63343/api/selection
-# Returns current selection or empty response
+# Returns current selection data or empty object {}
 ```
+
+### Claude says "No selection" or tool fails
+
+1. Make sure WebStorm is running and has focus
+2. Actually select text (not just place cursor)
+3. Test with curl first to verify plugin works
 
 ### Check WebStorm logs
 
 **Help** → **Show Log in Finder** → search for "IDE Bridge"
+
+### Check MCP server logs
+
+Run MCP server manually to see errors:
+
+```bash
+node /path/to/webstorm-mcp/mcp-server/dist/index.js
+# Should start without errors
+# Ctrl+C to stop
+```
 
 ## License
 

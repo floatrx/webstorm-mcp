@@ -21,9 +21,9 @@ When using Claude Code in a terminal, it cannot see what you have selected in yo
 
 ## Installation
 
-### From ZIP (Pre-built)
+### From Release (Recommended)
 
-1. Download the latest release ZIP
+1. Download `webstorm-ide-bridge-1.0.0.zip` from [Releases](https://github.com/floatrx/webstorm-mcp/releases)
 2. Open WebStorm → **Settings** → **Plugins**
 3. Click ⚙️ → **Install Plugin from Disk...**
 4. Select the downloaded ZIP file
