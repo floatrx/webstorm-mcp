@@ -54,7 +54,7 @@ Claude: "You have selected a TypeScript function at src/utils/helper.ts:45-52...
 
 **Option A: Download Pre-built (Recommended)**
 
-1. Download `webstorm-ide-bridge-1.0.0.zip` from [Releases](https://github.com/floatrx/webstorm-mcp/releases)
+1. Download `webstorm-ide-bridge-1.1.0.zip` from [Releases](https://github.com/floatrx/webstorm-mcp/releases)
 2. In WebStorm: **Settings** → **Plugins** → click ⚙️ (gear icon) → **Install Plugin from Disk...**
 3. Select the downloaded `.zip` file (do NOT extract it)
 4. Click **OK** and restart WebStorm
@@ -65,7 +65,7 @@ Claude: "You have selected a TypeScript function at src/utils/helper.ts:45-52...
 cd plugin
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21  # macOS with Homebrew
 ./gradlew buildPlugin
-# Install from: build/distributions/webstorm-ide-bridge-1.0.0.zip
+# Install from: build/distributions/webstorm-ide-bridge-1.1.0.zip
 ```
 
 ### 2. Build MCP Server
@@ -124,17 +124,17 @@ Create `.mcp.json` in your project root:
 /mcp
 ```
 
-You should see `webstorm-bridge` in the list of connected MCP servers with tools:
-- `get_ide_selection`
-- `get_ide_context`
+You should see `webstorm-bridge` in the list with 7 tools available.
 
 ### 5. Use It
 
 Select code in WebStorm, then ask Claude:
 - "What do I have selected in my IDE?"
 - "Explain this code" (while having code selected)
-- "Refactor the selected function"
-- "What file am I looking at?"
+- "What errors does WebStorm see?"
+- "What files do I have open?"
+- "What branch am I on?"
+- "What function is this?"
 
 ## MCP Tools
 
@@ -142,6 +142,11 @@ Select code in WebStorm, then ask Claude:
 |------|-------------|
 | `get_ide_selection` | Get selected text with file path, line numbers, language |
 | `get_ide_context` | Get cursor position and file info (even without selection) |
+| `get_ide_errors` | Get errors and warnings from IDE for current file |
+| `get_open_files` | Get list of currently open files/tabs |
+| `get_git_status` | Get current branch and changed files |
+| `get_recent_files` | Get list of recently opened files |
+| `get_symbol_at_cursor` | Get info about function/class at cursor position |
 
 ## API Reference
 
@@ -160,13 +165,47 @@ Select code in WebStorm, then ask Claude:
 }
 ```
 
+### GET http://localhost:63343/api/errors
+
+```json
+{
+  "filePath": "/path/to/file.ts",
+  "problems": [
+    {"message": "Cannot find name 'foo'", "severity": "ERROR", "line": 10, "column": 5}
+  ]
+}
+```
+
+### GET http://localhost:63343/api/open-files
+
+```json
+{
+  "projectName": "my-project",
+  "files": [
+    {"filePath": "/path/to/file.ts", "fileName": "file.ts", "isActive": true, "isModified": false}
+  ]
+}
+```
+
+### GET http://localhost:63343/api/git-status
+
+```json
+{
+  "branch": "main",
+  "repoRoot": "/path/to/repo",
+  "changes": [
+    {"filePath": "src/index.ts", "status": "MODIFIED"}
+  ]
+}
+```
+
 ### GET http://localhost:63343/api/health
 
 ```json
 {
   "status": "ok",
   "plugin": "ide-bridge",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
 ```
 
@@ -190,7 +229,7 @@ Select code in WebStorm, then ask Claude:
 
 ```bash
 curl http://localhost:63343/api/health
-# Should return: {"status":"ok","plugin":"ide-bridge","version":"1.0.0"}
+# Should return: {"status":"ok","plugin":"ide-bridge","version":"1.1.0"}
 ```
 
 If this fails:

@@ -26,8 +26,58 @@ class SelectionServer {
                     exchange.responseBody.use { it.write(json.toByteArray()) }
                 }
 
+                createContext("/api/errors") { exchange ->
+                    val problems = SelectionService.getProblems()
+                    val json = problems?.toJson() ?: emptyProblemsJson()
+
+                    exchange.responseHeaders.add("Content-Type", "application/json")
+                    exchange.responseHeaders.add("Access-Control-Allow-Origin", "*")
+                    exchange.sendResponseHeaders(200, json.toByteArray().size.toLong())
+                    exchange.responseBody.use { it.write(json.toByteArray()) }
+                }
+
+                createContext("/api/open-files") { exchange ->
+                    val openFiles = SelectionService.getOpenFiles()
+                    val json = openFiles?.toJson() ?: emptyOpenFilesJson()
+
+                    exchange.responseHeaders.add("Content-Type", "application/json")
+                    exchange.responseHeaders.add("Access-Control-Allow-Origin", "*")
+                    exchange.sendResponseHeaders(200, json.toByteArray().size.toLong())
+                    exchange.responseBody.use { it.write(json.toByteArray()) }
+                }
+
+                createContext("/api/git-status") { exchange ->
+                    val gitStatus = SelectionService.getGitStatus()
+                    val json = gitStatus?.toJson() ?: emptyGitStatusJson()
+
+                    exchange.responseHeaders.add("Content-Type", "application/json")
+                    exchange.responseHeaders.add("Access-Control-Allow-Origin", "*")
+                    exchange.sendResponseHeaders(200, json.toByteArray().size.toLong())
+                    exchange.responseBody.use { it.write(json.toByteArray()) }
+                }
+
+                createContext("/api/recent-files") { exchange ->
+                    val recentFiles = SelectionService.getRecentFiles()
+                    val json = recentFiles?.toJson() ?: emptyRecentFilesJson()
+
+                    exchange.responseHeaders.add("Content-Type", "application/json")
+                    exchange.responseHeaders.add("Access-Control-Allow-Origin", "*")
+                    exchange.sendResponseHeaders(200, json.toByteArray().size.toLong())
+                    exchange.responseBody.use { it.write(json.toByteArray()) }
+                }
+
+                createContext("/api/symbol") { exchange ->
+                    val symbol = SelectionService.getSymbolAtCursor()
+                    val json = symbol?.toJson() ?: emptySymbolJson()
+
+                    exchange.responseHeaders.add("Content-Type", "application/json")
+                    exchange.responseHeaders.add("Access-Control-Allow-Origin", "*")
+                    exchange.sendResponseHeaders(200, json.toByteArray().size.toLong())
+                    exchange.responseBody.use { it.write(json.toByteArray()) }
+                }
+
                 createContext("/api/health") { exchange ->
-                    val json = """{"status":"ok","plugin":"ide-bridge","version":"1.0.0"}"""
+                    val json = """{"status":"ok","plugin":"ide-bridge","version":"1.1.0"}"""
                     exchange.responseHeaders.add("Content-Type", "application/json")
                     exchange.sendResponseHeaders(200, json.toByteArray().size.toLong())
                     exchange.responseBody.use { it.write(json.toByteArray()) }
@@ -50,5 +100,25 @@ class SelectionServer {
 
     private fun emptySelectionJson(): String = """
         {"text":"","filePath":"","startLine":0,"endLine":0,"startColumn":0,"endColumn":0,"language":"","projectName":""}
+    """.trimIndent()
+
+    private fun emptyProblemsJson(): String = """
+        {"filePath":"","problems":[]}
+    """.trimIndent()
+
+    private fun emptyOpenFilesJson(): String = """
+        {"projectName":"","files":[]}
+    """.trimIndent()
+
+    private fun emptyGitStatusJson(): String = """
+        {"branch":"","repoRoot":"","changes":[]}
+    """.trimIndent()
+
+    private fun emptyRecentFilesJson(): String = """
+        {"projectName":"","files":[]}
+    """.trimIndent()
+
+    private fun emptySymbolJson(): String = """
+        {"name":"","kind":"","filePath":"","line":0,"text":""}
     """.trimIndent()
 }

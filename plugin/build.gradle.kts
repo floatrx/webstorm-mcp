@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.floatrx"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -18,6 +18,7 @@ dependencies {
     intellijPlatform {
         webstorm("2025.1")
         bundledPlugin("JavaScript")
+        bundledPlugin("Git4Idea")
         javaCompiler("253.30387.127") // Use latest available version
     }
 }

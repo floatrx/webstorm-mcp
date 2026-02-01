@@ -1,23 +1,37 @@
 <idea-plugin>
     <id>com.floatrx.idebridge</id>
     <name>IDE Bridge for Claude</name>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <vendor email="floatrx@gmail.com">floatrx</vendor>
 
     <idea-version since-build="251"/>
 
     <description><![CDATA[
-    Exposes IDE editor selection via HTTP endpoint for Claude Code MCP integration.
+    Exposes IDE editor context via HTTP endpoints for Claude Code MCP integration.
     <br/><br/>
     <b>Features:</b>
     <ul>
         <li>HTTP server on localhost:63343</li>
-        <li>GET /api/selection - returns current editor selection</li>
-        <li>Provides file path, line numbers, language info</li>
+        <li>Editor selection with file path, line numbers, language</li>
+        <li>IDE errors and warnings</li>
+        <li>Open files/tabs list</li>
+        <li>Git status (branch, changes)</li>
+        <li>Recently opened files</li>
+        <li>Symbol info at cursor</li>
+        <li>Automatic update notifications</li>
     </ul>
     ]]></description>
 
     <change-notes><![CDATA[
+    <b>1.1.0</b>
+    <ul>
+        <li>New: Get IDE errors/warnings</li>
+        <li>New: Get open files list</li>
+        <li>New: Get Git status</li>
+        <li>New: Get recent files</li>
+        <li>New: Get symbol at cursor</li>
+        <li>New: Update notifications from GitHub</li>
+    </ul>
     <b>1.0.0</b>
     <ul>
         <li>Initial release</li>
@@ -26,6 +40,14 @@
     ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>Git4Idea</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="IDE Bridge Updates"
+                           displayType="BALLOON"
+                           key="notification.group.ide.bridge.updates"/>
+        <postStartupActivity implementation="com.floatrx.idebridge.UpdateChecker"/>
+    </extensions>
 
     <applicationListeners>
         <listener
