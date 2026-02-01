@@ -1,0 +1,35 @@
+<idea-plugin>
+    <id>com.floatrx.idebridge</id>
+    <name>IDE Bridge for Claude</name>
+    <version>1.0.0</version>
+    <vendor email="floatrx@gmail.com">floatrx</vendor>
+
+    <idea-version since-build="251"/>
+
+    <description><![CDATA[
+    Exposes IDE editor selection via HTTP endpoint for Claude Code MCP integration.
+    <br/><br/>
+    <b>Features:</b>
+    <ul>
+        <li>HTTP server on localhost:63343</li>
+        <li>GET /api/selection - returns current editor selection</li>
+        <li>Provides file path, line numbers, language info</li>
+    </ul>
+    ]]></description>
+
+    <change-notes><![CDATA[
+    <b>1.0.0</b>
+    <ul>
+        <li>Initial release</li>
+        <li>HTTP endpoint for editor selection</li>
+    </ul>
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <applicationListeners>
+        <listener
+            class="com.floatrx.idebridge.SelectionServerStartup"
+            topic="com.intellij.ide.AppLifecycleListener"/>
+    </applicationListeners>
+</idea-plugin>
