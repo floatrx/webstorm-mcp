@@ -50,16 +50,28 @@ Claude: "You have selected a TypeScript function at src/utils/helper.ts:45-52...
 
 ### 1. Install Plugin
 
-> ⚠️ **Important:** This plugin is NOT available in JetBrains Marketplace. You must install it manually from the ZIP file.
+> ⚠️ **Important:** This plugin is NOT available in JetBrains Marketplace. Install manually or use custom repository.
 
-**Option A: Download Pre-built (Recommended)**
+**Option A: Custom Plugin Repository (Recommended)**
+
+Get automatic updates by adding our plugin repository:
+
+1. In WebStorm: **Settings** → **Plugins** → click ⚙️ → **Manage Plugin Repositories...**
+2. Click **+** and add:
+   ```
+   https://floatrx.github.io/webstorm-mcp/updatePlugins.xml
+   ```
+3. Click **OK**, then search for "IDE Bridge" in **Marketplace** tab
+4. Install and restart WebStorm
+
+**Option B: Download Pre-built**
 
 1. Download `webstorm-ide-bridge-1.1.0.zip` from [Releases](https://github.com/floatrx/webstorm-mcp/releases)
-2. In WebStorm: **Settings** → **Plugins** → click ⚙️ (gear icon) → **Install Plugin from Disk...**
+2. In WebStorm: **Settings** → **Plugins** → click ⚙️ → **Install Plugin from Disk...**
 3. Select the downloaded `.zip` file (do NOT extract it)
 4. Click **OK** and restart WebStorm
 
-**Option B: Build from Source**
+**Option C: Build from Source**
 
 ```bash
 cd plugin
@@ -208,6 +220,12 @@ Select code in WebStorm, then ask Claude:
   "version": "1.1.0"
 }
 ```
+
+## Automatic Updates
+
+The plugin checks for updates on GitHub releases at every startup. When a new version is available, you'll see a notification with a download link.
+
+If you installed via **Custom Plugin Repository**, updates will appear in WebStorm's plugin update mechanism automatically.
 
 ## Requirements
 
