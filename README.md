@@ -52,17 +52,20 @@ Claude: "You have selected a TypeScript function at src/utils/helper.ts:45-52...
 
 > ⚠️ **Important:** This plugin is NOT available in JetBrains Marketplace. Install manually or use custom repository.
 
-**Option A: Custom Plugin Repository (Recommended)**
+**Option A: Custom Plugin Repository (Recommended for Auto-Updates)**
 
-Get automatic updates by adding our plugin repository:
+Add our plugin repository to get automatic updates:
 
 1. In WebStorm: **Settings** → **Plugins** → click ⚙️ → **Manage Plugin Repositories...**
 2. Click **+** and add:
    ```
    https://floatrx.github.io/webstorm-mcp/updatePlugins.xml
    ```
-3. Click **OK**, then search for "IDE Bridge" in **Marketplace** tab
-4. Install and restart WebStorm
+3. Click **OK**
+4. Go to **Marketplace** tab → search "IDE Bridge" → **Install**
+5. Restart WebStorm
+
+WebStorm will now check for plugin updates automatically.
 
 **Option B: Download Pre-built**
 
